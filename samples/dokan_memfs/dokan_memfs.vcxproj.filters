@@ -33,6 +33,9 @@
     <ClCompile Include="memfs_helper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="authenticode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FileNode.h">
@@ -48,6 +51,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="filenodes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="authenticode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

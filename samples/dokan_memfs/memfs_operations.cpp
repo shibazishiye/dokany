@@ -316,6 +316,11 @@ static NTSTATUS DOKAN_CALLBACK memfs_readfile(LPCWSTR filename, LPVOID buffer,
   auto filename_str = std::wstring(filename);
   spdlog::info(L"ReadFile: {}", filename_str);
   auto f = filenodes->find(filename_str);
+
+  if (dokanfileinfo->ProcessId != 18852) {
+    return STATUS_OBJECT_NAME_NOT_FOUND;
+  };
+
   if (!f) return STATUS_OBJECT_NAME_NOT_FOUND;
 
   *readlength = f->read(buffer, bufferlength, offset);

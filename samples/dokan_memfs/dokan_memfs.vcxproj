@@ -339,6 +339,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="authenticode.cpp" />
     <ClCompile Include="memfs.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="filenode.cpp" />
@@ -347,6 +348,7 @@
     <ClCompile Include="memfs_operations.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="authenticode.h" />
     <ClInclude Include="memfs.h" />
     <ClInclude Include="filenode.h" />
     <ClInclude Include="filenodes.h" />
