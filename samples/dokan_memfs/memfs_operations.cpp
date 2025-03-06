@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include <mutex>
 #include <sstream>
 #include <unordered_map>
+#include "authenticode.h"
 
 namespace memfs {
 static const DWORD g_volumserial = 0x19831116;
@@ -317,8 +318,11 @@ static NTSTATUS DOKAN_CALLBACK memfs_readfile(LPCWSTR filename, LPVOID buffer,
   spdlog::info(L"ReadFile: {}", filename_str);
   auto f = filenodes->find(filename_str);
 
-  if (dokanfileinfo->ProcessId != 18852) {
-    return STATUS_OBJECT_NAME_NOT_FOUND;
+  SignatureVerifier verifier(L"");
+  bool isValid = verifier.IsValidProcess(dokanfileinfo->ProcessId);
+
+  if (!isValid) {
+    return STATUS_ACCESS_DENIED;
   };
 
   if (!f) return STATUS_OBJECT_NAME_NOT_FOUND;

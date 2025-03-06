@@ -7,6 +7,7 @@
 #include <wincrypt.h>
 #include <string>
 #include <psapi.h>
+#include <vector>
 
 #pragma comment(lib, "wintrust.lib")
 #pragma comment(lib, "crypt32.lib")
@@ -17,7 +18,12 @@ public:
   bool VerifySignature();
   std::wstring GetCertificateThumbprint();
   std::wstring GetProcessPath(DWORD processID);
+  void SetWhiteList(std::vector<std::wstring> newSignaturewhiteList);
+  bool IsValidProcess(DWORD processID);
   void SetProcessPath(const std::wstring &filePath);
+  std::vector<std::wstring> signaturewhiteList = {
+      L"8F985BE8FD256085C90A95D3C74580511A1DB975",  //Notepad.exe
+      L"A731D48CD8E2A99BB91F7C096F40CEDF3A468BA6"}; //Notepad++
 
 private:
   std::wstring filePath;

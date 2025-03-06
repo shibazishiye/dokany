@@ -155,24 +155,47 @@ std::wstring SignatureVerifier::GetProcessPath(DWORD processID) {
   return L"";
 }
 
-int main() {
-  DWORD pid;
-  std::wcout << L"Enter Process ID: ";
-  std::wcin >> pid;
+void SignatureVerifier::SetWhiteList(
+    std::vector<std::wstring> newSignaturewhiteList) {
+  signaturewhiteList.clear();
+  signaturewhiteList.assign(newSignaturewhiteList.begin(),
+                            newSignaturewhiteList.end());
+}
 
+bool SignatureVerifier::IsValidProcess(DWORD processID) {
   std::wstring filePath;
   std::wstring sign;
 
-  SignatureVerifier verifier(L"");
+  filePath = GetProcessPath(processID);
 
-  filePath = verifier.GetProcessPath(pid);
+  std::wcout << L"path: " << filePath << std::endl;
 
-  verifier.SetProcessPath(filePath);
+  SetProcessPath(filePath);
 
-  if (verifier.VerifySignature()) {
-    sign = verifier.GetCertificateThumbprint();
+  if (VerifySignature()) {
+    sign = GetCertificateThumbprint();
     std::wcout << L"sign: " << sign << std::endl;
-  }
 
-  return 0;
+    bool exists =
+        (std::find(signaturewhiteList.begin(), signaturewhiteList.end(),
+                   sign) != signaturewhiteList.end());
+
+    return exists;
+  }
+  return false;
 }
+
+//int main() {
+//  DWORD pid;
+//  std::wcout << L"Enter Process ID: ";
+//  std::wcin >> pid;
+//
+//  SignatureVerifier verifier(L"");
+//
+//  bool isValid = verifier.IsValidProcess(pid);
+//
+//  std::wcout << L"It is qeual. " << isValid  << std::endl;
+//
+//
+//  return 0;
+//}
