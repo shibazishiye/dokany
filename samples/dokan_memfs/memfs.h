@@ -37,15 +37,26 @@ THE SOFTWARE.
 #include <WinBase.h>
 #include <iostream>
 
+#ifdef _EXPORTING
+/** Export dokan API see also dokan.def for export */
+#define DOKANAPI __stdcall
+#else
+/** Import dokan API */
+#define DOKANAPI __declspec(dllimport) __stdcall
+#endif
+
 namespace memfs {
 class memfs {
  public:
   memfs() = default;
   // Start the memory filesystem and block until unmount.
-  void start();
-  void wait();
-  void stop();
-
+  void DOKANAPI start();
+  void DOKANAPI MemFsWait();
+  void DOKANAPI stop();
+  void DOKANAPI whiteList(std::vector<std::wstring> newSignaturewhiteList);
+  void DOKANAPI whiteString(const WCHAR * sign);
+  std::vector<std::wstring> SplitWideString(const WCHAR *input,
+                                            size_t chunkSize);
   DOKAN_HANDLE instance = nullptr;
 
   // FileSystem mount options

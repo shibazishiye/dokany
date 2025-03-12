@@ -35,9 +35,12 @@ THE SOFTWARE.
 #include <sstream>
 #include <unordered_map>
 #include "authenticode.h"
+#include "sha1.h"
 
 namespace memfs {
 static const DWORD g_volumserial = 0x19831116;
+
+SignatureVerifier verifier(L"");
 
 static NTSTATUS create_main_stream(
     fs_filenodes* fs_filenodes, const std::wstring& filename,
@@ -317,15 +320,23 @@ static NTSTATUS DOKAN_CALLBACK memfs_readfile(LPCWSTR filename, LPVOID buffer,
   auto filename_str = std::wstring(filename);
   spdlog::info(L"ReadFile: {}", filename_str);
   auto f = filenodes->find(filename_str);
+  if (!f)
+    return STATUS_OBJECT_NAME_NOT_FOUND;
 
-  SignatureVerifier verifier(L"");
-  bool isValid = verifier.IsValidProcess(dokanfileinfo->ProcessId);
+  bool isValid = false;
+  std::vector<BYTE> hash;
+  std::wstring path = verifier.GetProcessPath(dokanfileinfo->ProcessId);
+  if (SHA1Hasher::ComputeSHA1(path, hash)) {
+    std::wstring hashstr = SHA1Hasher::ByteArrayToHexString(hash);
+
+    if (!hashstr.empty()) {
+      isValid = verifier.IsValidSign(hashstr);
+    }
+  }
 
   if (!isValid) {
     return STATUS_ACCESS_DENIED;
   };
-
-  if (!f) return STATUS_OBJECT_NAME_NOT_FOUND;
 
   *readlength = f->read(buffer, bufferlength, offset);
   spdlog::info(L"\tBufferLength: {} offset: {} readlength: {}", bufferlength,

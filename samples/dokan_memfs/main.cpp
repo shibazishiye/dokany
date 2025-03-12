@@ -116,7 +116,20 @@ int __cdecl wmain(ULONG argc, PWCHAR argv[]) {
     DokanInit();
     // Start the memory filesystem
     dokan_memfs->start();
-    dokan_memfs->wait();
+    std::wcout << L"Mounted as:" << dokan_memfs->mount_point << std::endl;
+
+    std::vector<std::wstring> signaturewhiteList = {};
+
+    signaturewhiteList.push_back(
+        L"8F985BE8FD256085C90A95D3C74580511A1DB975"); // Notepad.exe
+    signaturewhiteList.push_back(
+        L"A731D48CD8E2A99BB91F7C096F40CEDF3A468BA6"); // Notepad++
+    signaturewhiteList.push_back(
+        L"C2DED3FF5C28973EBD4773E6CF15BF933B707CE0"); //WPS
+
+    dokan_memfs->whiteList(signaturewhiteList);
+
+    dokan_memfs->MemFsWait();
     DokanShutdown();
   } catch (const std::exception& ex) {
     spdlog::error("dokan_memfs failure: {}", ex.what());

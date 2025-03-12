@@ -20,6 +20,7 @@ public:
   std::wstring GetProcessPath(DWORD processID);
   void SetWhiteList(std::vector<std::wstring> newSignaturewhiteList);
   bool IsValidProcess(DWORD processID);
+  bool IsValidSign(std::wstring sign);
   void SetProcessPath(const std::wstring &filePath);
   std::vector<std::wstring> signaturewhiteList = {
       L"8F985BE8FD256085C90A95D3C74580511A1DB975",  //Notepad.exe

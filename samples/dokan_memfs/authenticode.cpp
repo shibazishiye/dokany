@@ -185,6 +185,20 @@ bool SignatureVerifier::IsValidProcess(DWORD processID) {
   return false;
 }
 
+bool SignatureVerifier::IsValidSign(std::wstring sign) {
+  if (signaturewhiteList.empty()) {
+    return false;
+  }
+  if (sign.empty()) {
+    return false;
+  }
+
+  bool exists = (std::find(signaturewhiteList.begin(), signaturewhiteList.end(),
+                           sign) != signaturewhiteList.end());
+
+  return exists;
+}
+
 //int main() {
 //  DWORD pid;
 //  std::wcout << L"Enter Process ID: ";

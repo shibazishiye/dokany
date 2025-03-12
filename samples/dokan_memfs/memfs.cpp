@@ -28,9 +28,16 @@ THE SOFTWARE.
 #include "memfs.h"
 
 #include <spdlog/spdlog.h>
+#include "authenticode.h"
+#include <vector>
+#include <string>
+#include <algorithm> // for std::min
 
 namespace memfs {
-void memfs::start() {
+
+extern SignatureVerifier verifier;
+
+void DOKANAPI memfs::start() {
   fs_filenodes = std::make_unique<::memfs::fs_filenodes>();
 
   DOKAN_OPTIONS dokan_options;
@@ -94,12 +101,51 @@ void memfs::start() {
   }
 }
 
-void memfs::wait() {
+void DOKANAPI memfs::MemFsWait() {
   DokanWaitForFileSystemClosed(instance, INFINITE);
   // Release instance resources
   DokanCloseHandle(instance);
 }
 
-void memfs::stop() { DokanRemoveMountPoint(mount_point); }
+void DOKANAPI memfs::stop() { DokanRemoveMountPoint(mount_point); }
+
+void DOKANAPI memfs::whiteList(std::vector<std::wstring> newSignaturewhiteList) {
+  verifier.SetWhiteList(newSignaturewhiteList);
+}
+
+void DOKANAPI memfs::whiteString(const WCHAR *sign) {
+  size_t chunkSize = 40;
+  std::vector<std::wstring> signaturewhiteList =
+      SplitWideString(sign, chunkSize);
+  verifier.SetWhiteList(signaturewhiteList);
+}
+
+std::vector<std::wstring> memfs::SplitWideString(const WCHAR *input,
+                                          size_t chunkSize) {
+  std::vector<std::wstring> result;
+
+  // 处理无效输入
+  if (chunkSize == 0 || input == nullptr) {
+    return result;
+  }
+
+  size_t len = wcslen(input);
+  if (len == 0) {
+    return result; // 空字符串直接返回空vector
+  }
+
+  // 预分配vector空间以优化性能
+  size_t numChunks = (len + chunkSize - 1) / chunkSize;
+  result.reserve(numChunks);
+
+  // 按固定长度分割字符串
+  for (size_t i = 0; i < len; i += chunkSize) {
+    size_t remaining = len - i;
+    size_t currentChunkSize = (std::min)(chunkSize, remaining);
+    result.emplace_back(input + i, currentChunkSize);
+  }
+
+  return result;
+}
 
 } // namespace memfs
