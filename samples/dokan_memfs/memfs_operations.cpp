@@ -637,7 +637,7 @@ static NTSTATUS DOKAN_CALLBACK memfs_getvolumeinformation(
     LPDWORD filesystem_flags, LPWSTR filesystem_name_buffer,
     DWORD filesystem_name_size, PDOKAN_FILE_INFO /*dokanfileinfo*/) {
   spdlog::info(L"GetVolumeInformation");
-  wcscpy_s(volumename_buffer, volumename_size, L"Dokan MemFS");
+  wcscpy_s(volumename_buffer, volumename_size, L"TDA Disk");
   *volume_serialnumber = g_volumserial;
   *maximum_component_length = 255;
   *filesystem_flags = FILE_CASE_SENSITIVE_SEARCH | FILE_CASE_PRESERVED_NAMES |
