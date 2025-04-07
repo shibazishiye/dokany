@@ -116,7 +116,7 @@ int __cdecl wmain(ULONG argc, PWCHAR argv[]) {
     DokanInit();
     // Start the memory filesystem
     dokan_memfs->start();
-    std::wcout << L"Mounted as:" << dokan_memfs->mount_point << std::endl;
+    // std::wcout << L"Mounted as:" << dokan_memfs->mount_point << std::endl;
 
     std::vector<std::wstring> signaturewhiteList = {};
 

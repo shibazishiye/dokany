@@ -338,6 +338,42 @@ static NTSTATUS DOKAN_CALLBACK memfs_readfile(LPCWSTR filename, LPVOID buffer,
     return STATUS_ACCESS_DENIED;
   };
 
+  //TODO:此时应当检查该进程是否处于挂钩状态，如果没有挂钩，依旧禁止访问
+
+  //  创建事件对象（自动重置）
+  std::string prefixPing = "Global\\PingEvent";
+  std::string prefixPong = "Global\\PongEvent";
+  std::string strProcessId = std::to_string(dokanfileinfo->ProcessId); 
+  std::string ping = prefixPing + strProcessId;
+  std::string pong = prefixPong + strProcessId;
+
+  
+  HANDLE hPingEvent = OpenEventA(EVENT_ALL_ACCESS, FALSE, ping.c_str());
+  HANDLE hPongEvent = OpenEventA(EVENT_ALL_ACCESS, FALSE, pong.c_str());
+
+  if (!hPingEvent || !hPongEvent) {
+    std::cerr << "OpenEventA failed: " << GetLastError() << std::endl;
+    return STATUS_ACCESS_DENIED;
+  }
+
+  // 触发 Ping 事件
+  SetEvent(hPingEvent);
+
+  // 等待 Pong 响应
+  DWORD result = WaitForSingleObject(hPongEvent, 500);
+
+  bool isHooked = false;
+  if (result == WAIT_OBJECT_0) {
+    isHooked = true;
+  }
+
+  CloseHandle(hPingEvent);
+  CloseHandle(hPongEvent);
+
+  if (!isHooked) {
+    return STATUS_ACCESS_DENIED;
+  };
+
   *readlength = f->read(buffer, bufferlength, offset);
   spdlog::info(L"\tBufferLength: {} offset: {} readlength: {}", bufferlength,
                offset, *readlength);

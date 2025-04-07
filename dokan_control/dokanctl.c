@@ -39,19 +39,19 @@ THE SOFTWARE.
 
 int ShowUsage() {
   fprintf(stderr,
-          "dokanctl /u MountPoint\n"
-          "dokanctl /u M\n"
-          "dokanctl /i [d|n|a]\n"
-          "dokanctl /r [d|n|a]\n"
-          "dokanctl /v\n"
+          "tdactl /u MountPoint\n"
+          "tdactl /u M\n"
+          "tdactl /a [d|n|a]\n"
+          "tdactl /x [d|n|a]\n"
+          "tdactl /v\n"
           "\n"
           "Example:\n"
           "  /u M                : Unmount M: drive\n"
           "  /u C:\\mount\\dokan   : Unmount mount point C:\\mount\\dokan\n"
-          "  /i d                : Install driver\n"
-          "  /i n                : Install network provider\n"
-          "  /r d                : Remove driver\n"
-          "  /r n                : Remove network provider\n"
+          "  /a d                : Install driver\n"
+          "  /a n                : Install network provider\n"
+          "  /x d                : Remove driver\n"
+          "  /x n                : Remove network provider\n"
           "  /l a                : List current mount points\n"
           "  /d [0-7]            : Enable Kernel Debug output\n"
           "  /v                  : Print Dokan version\n");
@@ -134,19 +134,19 @@ int __cdecl wmain(int argc, PWCHAR argv[]) {
   fwprintf(stdout, L"Driver path: '%ls'\n", driverFullPath);
 
   WCHAR option = GetOption(argc, argv, 1);
-  if (option == L'\0' || option == L'?') {
+  if (option == L'h') {
     return ShowUsage();
   }
 
   if (!isAdmin &&
-      (option == L'i' || option == L'r' || option == L'd' || option == L'u')) {
+      (option == L'a' || option == L'x' || option == L'd' || option == L'u')) {
     fprintf(stderr, "Admin rights required to process this operation\n");
     return EXIT_FAILURE;
   }
 
   switch (option) {
   // Admin rights required
-  case L'i': {
+  case L'a': {
     WCHAR type = towlower(argv[2][0]);
     int result = EXIT_SUCCESS;
     if (type != L'd' && type != L'n' && type != L'a') {
@@ -167,7 +167,7 @@ int __cdecl wmain(int argc, PWCHAR argv[]) {
     return result;
   }
 
-  case L'r': {
+  case L'x': {
     WCHAR type = towlower(argv[2][0]);
     int result = EXIT_SUCCESS;
     if (type != L'd' && type != L'n' && type != L'a') {
@@ -229,7 +229,7 @@ int __cdecl wmain(int argc, PWCHAR argv[]) {
   } break;
 
   case L'v': {
-    fprintf(stdout, "dokanctl : %s %s\n", __DATE__, __TIME__);
+    fprintf(stdout, "tdactl : %s %s\n", __DATE__, __TIME__);
     fprintf(stdout, "Dokan version : %ld\n", DokanVersion());
     fprintf(stdout, "Dokan driver version : 0x%lx\n", DokanDriverVersion());
   } break;
