@@ -162,6 +162,16 @@ void SignatureVerifier::SetWhiteList(
                             newSignaturewhiteList.end());
 }
 
+bool SignatureVerifier::isProcessInWhiteList(DWORD processID) {
+  return std::find(whiteProcesses.begin(), whiteProcesses.end(), processID) !=
+         whiteProcesses.end();
+}
+
+bool SignatureVerifier::isProcessInBlackList(DWORD processID) {
+  return std::find(blackProcesses.begin(), blackProcesses.end(), processID) !=
+         blackProcesses.end();
+}
+
 bool SignatureVerifier::IsValidProcess(DWORD processID) {
   std::wstring filePath;
   std::wstring sign;

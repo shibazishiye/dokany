@@ -7,3 +7,4 @@ MemFsWait
 stop
 whiteList
 whiteString
+isValidProcessID

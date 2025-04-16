@@ -120,6 +120,10 @@ void DOKANAPI memfs::whiteString(const WCHAR *sign) {
   verifier.SetWhiteList(signaturewhiteList);
 }
 
+bool DOKANAPI memfs::isValidProcessID(DWORD processID) {
+  return verifier.isProcessInWhiteList(processID);
+}
+
 std::vector<std::wstring> memfs::SplitWideString(const WCHAR *input,
                                           size_t chunkSize) {
   std::vector<std::wstring> result;
@@ -147,5 +151,4 @@ std::vector<std::wstring> memfs::SplitWideString(const WCHAR *input,
 
   return result;
 }
-
 } // namespace memfs

@@ -55,8 +55,12 @@ class memfs {
   void DOKANAPI stop();
   void DOKANAPI whiteList(std::vector<std::wstring> newSignaturewhiteList);
   void DOKANAPI whiteString(const WCHAR * sign);
+  bool DOKANAPI isValidProcessID(DWORD processID);
+
   std::vector<std::wstring> SplitWideString(const WCHAR *input,
                                             size_t chunkSize);
+  
+
   DOKAN_HANDLE instance = nullptr;
 
   // FileSystem mount options

@@ -323,20 +323,31 @@ static NTSTATUS DOKAN_CALLBACK memfs_readfile(LPCWSTR filename, LPVOID buffer,
   if (!f)
     return STATUS_OBJECT_NAME_NOT_FOUND;
 
-  bool isValid = false;
-  std::vector<BYTE> hash;
-  std::wstring path = verifier.GetProcessPath(dokanfileinfo->ProcessId);
-  if (SHA1Hasher::ComputeSHA1(path, hash)) {
-    std::wstring hashstr = SHA1Hasher::ByteArrayToHexString(hash);
-
-    if (!hashstr.empty()) {
-      isValid = verifier.IsValidSign(hashstr);
-    }
+  //首先检查是否已经在黑名单，在的直接返回
+  if (verifier.isProcessInBlackList(dokanfileinfo->ProcessId)) {
+    return STATUS_OBJECT_NAME_NOT_FOUND;
   }
 
-  if (!isValid) {
-    return STATUS_ACCESS_DENIED;
-  };
+  //首先检查是否已经在白名单, 不在的检查一下
+  if (!verifier.isProcessInWhiteList(dokanfileinfo->ProcessId)) {
+    bool isValid = false;
+    std::vector<BYTE> hash;
+    std::wstring path = verifier.GetProcessPath(dokanfileinfo->ProcessId);
+    if (SHA1Hasher::ComputeSHA1(path, hash)) {
+      std::wstring hashstr = SHA1Hasher::ByteArrayToHexString(hash);
+
+      if (!hashstr.empty()) {
+        isValid = verifier.IsValidSign(hashstr);
+      }
+    }
+
+    if (!isValid) {
+      verifier.blackProcesses.push_back(dokanfileinfo->ProcessId);
+      return STATUS_ACCESS_DENIED;
+    } else {
+      verifier.whiteProcesses.push_back(dokanfileinfo->ProcessId);
+    };
+  }
 
   //TODO:此时应当检查该进程是否处于挂钩状态，如果没有挂钩，依旧禁止访问
 
